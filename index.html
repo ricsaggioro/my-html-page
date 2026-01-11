@@ -25,24 +25,21 @@
     text-align: center;
   }
 
-  /* Main date */
   .date-main {
     font-size: 50px;
     font-weight: 300;
   }
 
-  /* Day of the week below date */
   .date-day {
-    font-size: 25px; /* 50% smaller */
-    color: #aaa;      /* slightly darker */
+    font-size: 25px;
+    color: #aaa;
     margin-top: 5px;
     font-weight: 300;
   }
 
-  /* Time with less bold font */
   .time {
     font-size: 120px;
-    font-weight: 300; /* reduced */
+    font-weight: 300;
   }
 
   .time .seconds {
@@ -50,7 +47,6 @@
     color: #aaa;
   }
 
-  /* Weather top-right scaled down */
   .weather {
     position: absolute;
     top: 20px;
@@ -58,7 +54,7 @@
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    transform: scale(0.7); /* reduced by 30% */
+    transform: scale(0.7);
     transform-origin: top right;
     font-weight: 300;
   }
@@ -78,13 +74,11 @@
   #temperature {
     font-size: 50px;
   }
-
 </style>
 </head>
 <body>
 
 <div class="weather" id="weather">
-  <!-- SVG Sun Icon -->
   <svg class="icon" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
     <circle cx="32" cy="32" r="14"/>
     <line x1="32" y1="2" x2="32" y2="14" stroke="#fff" stroke-width="4"/>
@@ -107,15 +101,13 @@
 </div>
 
 <script>
-  // Update time every second in 24-hour format
+  // --- TIME AND DATE ---
   function updateTime() {
     const now = new Date();
     const hours = now.getHours().toString().padStart(2, '0');
     const minutes = now.getMinutes().toString().padStart(2, '0');
     const seconds = now.getSeconds().toString().padStart(2, '0');
     document.getElementById('time').innerHTML = `${hours}:${minutes}:<span class="seconds">${seconds}</span>`;
-
-    // Date
     const optionsDate = { year: 'numeric', month: 'long', day: 'numeric' };
     const optionsDay = { weekday: 'long' };
     document.getElementById('date-main').textContent = now.toLocaleDateString(undefined, optionsDate);
@@ -124,10 +116,10 @@
   setInterval(updateTime, 1000);
   updateTime();
 
-  // Update weather every 10 minutes using wttr.in API, fixed location to Vergato
+  // --- WEATHER ---
   async function updateWeather() {
     try {
-      const res = await fetch('https://wttr.in/Vergato?format=%t'); // only temperature
+      const res = await fetch('https://wttr.in/Vergato?format=%t');
       const temp = await res.text();
       document.getElementById('temperature').textContent = temp;
     } catch(e) {
@@ -135,11 +127,26 @@
     }
   }
   updateWeather();
-  setInterval(updateWeather, 600000); // every 10 min
+  setInterval(updateWeather, 600000); // every 10 minutes
+
+  // --- HEARTBEAT TO PREVENT FIRESTICK SLEEP ---
+  // Every 30 seconds, trigger a tiny dummy update to keep browser active
+  setInterval(() => {
+    const hb = document.getElementById('heartbeat');
+    if (!hb) {
+      const span = document.createElement('span');
+      span.id = 'heartbeat';
+      span.style.display = 'none';
+      document.body.appendChild(span);
+    } else {
+      hb.textContent = new Date().getTime(); // update timestamp
+    }
+  }, 30000); // 30 seconds
 </script>
 
 </body>
 </html>
+
 
 
 
