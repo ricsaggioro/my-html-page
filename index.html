@@ -25,15 +25,24 @@
     text-align: center;
   }
 
-  .date {
+  /* Main date */
+  .date-main {
     font-size: 50px;
     font-weight: 300;
-    margin-bottom: 20px;
   }
 
+  /* Day of the week below date */
+  .date-day {
+    font-size: 25px; /* 50% smaller */
+    color: #aaa;      /* slightly darker */
+    margin-top: 5px;
+    font-weight: 300;
+  }
+
+  /* Time with less bold font */
   .time {
     font-size: 120px;
-    font-weight: 400;
+    font-weight: 300; /* reduced */
   }
 
   .time .seconds {
@@ -41,13 +50,17 @@
     color: #aaa;
   }
 
+  /* Weather top-right scaled down */
   .weather {
     position: absolute;
     top: 20px;
     right: 20px;
-    font-size: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    transform: scale(0.7); /* reduced by 30% */
+    transform-origin: top right;
     font-weight: 300;
-    text-align: right;
   }
 
   .weather .location {
@@ -56,22 +69,40 @@
     margin-top: 5px;
   }
 
-  /* Minimal black & white icon */
   .weather .icon {
-    font-size: 50px;
-    line-height: 1;
-    color: #fff;
+    width: 50px;
+    height: 50px;
+    fill: #fff;
   }
+
+  #temperature {
+    font-size: 50px;
+  }
+
 </style>
 </head>
 <body>
 
 <div class="weather" id="weather">
-  <span class="icon">☀</span> --°<span class="location">Vergato</span>
+  <!-- SVG Sun Icon -->
+  <svg class="icon" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="32" cy="32" r="14"/>
+    <line x1="32" y1="2" x2="32" y2="14" stroke="#fff" stroke-width="4"/>
+    <line x1="32" y1="50" x2="32" y2="62" stroke="#fff" stroke-width="4"/>
+    <line x1="2" y1="32" x2="14" y2="32" stroke="#fff" stroke-width="4"/>
+    <line x1="50" y1="32" x2="62" y2="32" stroke="#fff" stroke-width="4"/>
+    <line x1="10" y1="10" x2="20" y2="20" stroke="#fff" stroke-width="4"/>
+    <line x1="44" y1="44" x2="54" y2="54" stroke="#fff" stroke-width="4"/>
+    <line x1="10" y1="54" x2="20" y2="44" stroke="#fff" stroke-width="4"/>
+    <line x1="44" y1="20" x2="54" y2="10" stroke="#fff" stroke-width="4"/>
+  </svg>
+  <span id="temperature">--°</span>
+  <span class="location">Vergato</span>
 </div>
 
 <div class="center">
-  <div class="date" id="date">Loading...</div>
+  <div class="date-main" id="date-main">Loading...</div>
+  <div class="date-day" id="date-day">Loading...</div>
   <div class="time" id="time">--:--:<span class="seconds">--</span></div>
 </div>
 
@@ -83,9 +114,12 @@
     const minutes = now.getMinutes().toString().padStart(2, '0');
     const seconds = now.getSeconds().toString().padStart(2, '0');
     document.getElementById('time').innerHTML = `${hours}:${minutes}:<span class="seconds">${seconds}</span>`;
-    document.getElementById('date').textContent = now.toLocaleDateString(undefined, {
-      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-    });
+
+    // Date
+    const optionsDate = { year: 'numeric', month: 'long', day: 'numeric' };
+    const optionsDay = { weekday: 'long' };
+    document.getElementById('date-main').textContent = now.toLocaleDateString(undefined, optionsDate);
+    document.getElementById('date-day').textContent = now.toLocaleDateString(undefined, optionsDay);
   }
   setInterval(updateTime, 1000);
   updateTime();
@@ -95,9 +129,9 @@
     try {
       const res = await fetch('https://wttr.in/Vergato?format=%t'); // only temperature
       const temp = await res.text();
-      document.getElementById('weather').innerHTML = `<span class="icon">☀</span> ${temp}<span class="location">Vergato</span>`;
+      document.getElementById('temperature').textContent = temp;
     } catch(e) {
-      document.getElementById('weather').textContent = 'Weather error';
+      document.getElementById('temperature').textContent = 'Weather error';
     }
   }
   updateWeather();
@@ -106,5 +140,6 @@
 
 </body>
 </html>
+
 
 
